@@ -1,5 +1,10 @@
 <script lang="ts">
-	import Timeline from './lib/Timeline.svelte';
+	import { Router, Route } from 'svelte-routing';
+	import { MAIN_ROUTES } from './routes/main_routes';
 </script>
 
-<Timeline />
+<Router>
+	{#each MAIN_ROUTES as { path, component } (path)}
+		<Route {path} {component} />
+	{/each}
+</Router>
