@@ -1,24 +1,54 @@
-<style lang="postcss">
-	.logo {
-		color: #8b55dd;
-		display: block;
-		flex: none;
-		background: currentColor;
-		mask-size: contain;
-		mask-repeat: no-repeat;
-		mask-position: center;
-		width: 1.8333ex;
-		height: 1.8333ex;
-		mask-image: url('../assets/logo-symbol.svg');
-	}
-</style>
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { fetchTasks, taskStore } from '../stores/task_store';
+	import Draggable from '../components/Draggable.svelte';
+	import type { IFetchTasksQueryParams, ITasksStoreState } from '../types';
+	import type { TaskModel } from '../models/task_model';
 
-<main class="flex min-h-screen items-center justify-center">
-	<a
-		class="logo"
-		href="https://plan.toggl.com"
-		target="_blank"
-		rel="noopener noreferrer">
-	</a>
-	<p class="ml-1">👋 Welcome to your homework template!</p>
-</main>
+	let tasks: TaskModel[] = [];
+
+	onMount(() => {
+		// Fetch tasks on component mount
+		const params: IFetchTasksQueryParams = {
+			since: '2023-12-04',
+			until: '2024-04-21',
+			short: true,
+			team: 715879,
+		};
+		fetchTasks(params);
+
+		// Subscribe to changes in the tasks array
+		const unsubscribe = taskStore.subscribe((state: ITasksStoreState) => {
+			tasks = state.tasks;
+			console.log(tasks);
+		});
+
+		// Cleanup subscription on component destruction
+		return () => {
+			unsubscribe();
+		};
+	});
+
+	const handleDragStart = (event: DragEvent, taskId: number) => {
+		// Custom logic on drag start
+		console.log('Drag started for task:', taskId);
+	};
+
+	const handleDrop = (event: DragEvent, taskId: number) => {
+		// Custom logic on drop
+		console.log('Task dropped with ID:', taskId, event);
+	};
+</script>
+
+<div>
+	{#each tasks as task (task.id)}
+		<Draggable
+			bind:itemId={task.id}
+			onDragStart={handleDragStart}
+			onDragOver={handleDragStart}
+			onDrop={handleDrop}>
+			<p>{task.name}</p>
+			<p>{task.endDate}</p>
+		</Draggable>
+	{/each}
+</div>
