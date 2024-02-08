@@ -60,6 +60,7 @@
 			}
 			return t;
 		});
+		taskStore.saveTasks(tasks);
 		renderGrid();
 	};
 
