@@ -1,6 +1,3 @@
-Certainly! Here's the content in Markdown format that you can copy and paste into a `readme.md` file:
-
-```markdown
 # Toggl Timeline
 
 ## Description
