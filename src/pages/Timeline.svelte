@@ -26,14 +26,20 @@
 		};
 	});
 
+	const fetchTasks = (params: IFetchTasksQueryParams) => {
+		taskStore.fetchTasks(params);
+	};
+
 	const loadTasks = () => {
+		const [since, until] =
+			TimelineGridUtil.calculateDateRange(selectedDaysFilter);
 		const params: IFetchTasksQueryParams = {
-			since: TimelineGridUtil.getISODate(new Date(), -7),
-			until: TimelineGridUtil.getISODate(new Date(), 7),
+			since,
+			until,
 			short: true,
 			team: 715879,
 		};
-		taskStore.fetchTasks(params);
+		fetchTasks(params);
 
 		return taskStore.getTasks().subscribe((state: ITasksStoreState) => {
 			tasks = state.tasks;
@@ -49,14 +55,14 @@
 	const handleDrop = (event: DragEvent, task: DraggableGridItem) => {
 		tasks = tasks.map((t) => {
 			if (t.id === task.id) {
-				const startDate = task.columnId;
+				const { columnId, colSpan } = task;
+				const startDate = columnId;
 				const endDate = TimelineGridUtil.getISODate(
 					new Date(startDate),
-					task.colSpan - 1
+					colSpan - 1
 				);
 				t.startDate = startDate;
 				t.endDate = endDate;
-				return t;
 			}
 			return t;
 		});
@@ -81,16 +87,16 @@
 
 <div class="timeline">
 	<h1 class="mb-6 text-3xl font-bold">Toggl Timeline</h1>
-	<label for="filter" class="mr-2">Days (+/-):</label>
-	<select
-		id="filter"
-		bind:value={selectedDaysFilter}
-		on:change={handleFilterChange}>
-		{#each filterOptions as option (option)}
-			<option value={option}>{option}</option>
-		{/each}
-	</select>
 	{#if !!draggableItems.length}
+		<label for="filter" class="mr-2">Days (+/-):</label>
+		<select
+			id="filter"
+			bind:value={selectedDaysFilter}
+			on:change={handleFilterChange}>
+			{#each filterOptions as option (option)}
+				<option value={option}>{option}</option>
+			{/each}
+		</select>
 		<DraggableGrid
 			bind:items={draggableItems}
 			bind:columns
