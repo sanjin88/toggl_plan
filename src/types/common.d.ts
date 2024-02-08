@@ -1,4 +1,3 @@
-import type { Writable } from "svelte/store";
 import type { TaskModel } from "../models/task_model";
 
 export interface IFetchTasksQueryParams {
@@ -52,4 +51,6 @@ export interface ITaskResponse {
 
 export interface ITasksStoreState {
     tasks: TaskModel[];
-  }
+}
+
+export interface IGroupedTimelineItemsMap { [x: string]: TaskModel[] }
